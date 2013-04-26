@@ -213,3 +213,91 @@ int arrayqueue_count(
 {
     return in(qu)->count;
 }
+
+
+int arrayqueue_has_next(
+    arrayqueue_t* qu,
+    arrayqueue_iterator_t* iter
+)
+{
+    if (iter->current == in(qu)->back)
+    {
+        return 0;
+    }
+    return 1;
+}
+
+void *arrayqueue_iterator_next(
+    arrayqueue_t* qu,
+    arrayqueue_iterator_t* iter
+)
+{
+    if (!arrayqueue_has_next(qu,iter))
+        return NULL;
+
+    if (iter->current == in(qu)->arraySize)
+        iter->current = 0;
+
+    return (void *) qu->array[iter->current++];
+}
+
+int arrayqueue_has_next_reverse(
+    arrayqueue_t* qu,
+    arrayqueue_iterator_t* iter
+)
+{
+    int end;
+    
+    end = in(qu)->front - 1;
+
+    if (end < 0)
+    {
+        end = in(qu)->arraySize - 1;
+    }
+
+    if (iter->current == end)
+    {
+        return 0;
+    }
+
+    return 1;
+}
+
+void *arrayqueue_next_reverse(
+    arrayqueue_t* qu,
+    arrayqueue_iterator_t* iter
+)
+{
+    void *val;
+    
+    if (!arrayqueue_has_next_reverse(qu,iter))
+        return NULL;
+
+    val = (void *) qu->array[iter->current];
+
+    iter->current--;
+    if (iter->current < 0)
+    {
+        iter->current = in(qu)->arraySize - 1;
+    }
+    return val;
+}
+
+void arrayqueue_iterator_reverse(
+    arrayqueue_t* qu,
+    arrayqueue_iterator_t* iter
+)
+{
+    iter->current = in(qu)->back - 1;
+    if (iter->current < 0)
+        iter->current = in(qu)->arraySize - 1;
+}
+
+void arrayqueue_iterator(
+    arrayqueue_t * qu,
+    arrayqueue_iterator_t * iter
+)
+{
+    iter->current = in(qu)->front;
+}
+
