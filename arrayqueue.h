@@ -28,13 +28,13 @@ void arrayqueue_free( arrayqueue_t * qu);
 
 int arrayqueue_count( arrayqueue_t * qu);
 
-int arrayqueue_has_next( arrayqueue_t* qu, arrayqueue_iterator_t* iter);
+int arrayqueue_iterator_has_next( arrayqueue_t* qu, arrayqueue_iterator_t* iter);
 
 void *arrayqueue_iterator_next( arrayqueue_t* qu, arrayqueue_iterator_t* iter);
 
-int arrayqueue_has_next_reverse( arrayqueue_t* qu, arrayqueue_iterator_t* iter);
+int arrayqueue_iterator_has_next_reverse( arrayqueue_t* qu, arrayqueue_iterator_t* iter);
 
-void *arrayqueue_next_reverse( arrayqueue_t* qu, arrayqueue_iterator_t* iter);
+void *arrayqueue_iterator_next_reverse( arrayqueue_t* qu, arrayqueue_iterator_t* iter);
 
 void arrayqueue_iterator_reverse( arrayqueue_t* qu, arrayqueue_iterator_t* iter);
 

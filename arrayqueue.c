@@ -215,7 +215,7 @@ int arrayqueue_count(
 }
 
 
-int arrayqueue_has_next(
+int arrayqueue_iterator_has_next(
     arrayqueue_t* qu,
     arrayqueue_iterator_t* iter
 )
@@ -232,7 +232,7 @@ void *arrayqueue_iterator_next(
     arrayqueue_iterator_t* iter
 )
 {
-    if (!arrayqueue_has_next(qu,iter))
+    if (!arrayqueue_iterator_has_next(qu,iter))
         return NULL;
 
     if (iter->current == in(qu)->arraySize)
@@ -241,7 +241,7 @@ void *arrayqueue_iterator_next(
     return (void *) qu->array[iter->current++];
 }
 
-int arrayqueue_has_next_reverse(
+int arrayqueue_iterator_has_next_reverse(
     arrayqueue_t* qu,
     arrayqueue_iterator_t* iter
 )
@@ -263,14 +263,14 @@ int arrayqueue_has_next_reverse(
     return 1;
 }
 
-void *arrayqueue_next_reverse(
+void *arrayqueue_iterator_next_reverse(
     arrayqueue_t* qu,
     arrayqueue_iterator_t* iter
 )
 {
     void *val;
     
-    if (!arrayqueue_has_next_reverse(qu,iter))
+    if (!arrayqueue_iterator_has_next_reverse(qu,iter))
         return NULL;
 
     val = (void *) qu->array[iter->current];
