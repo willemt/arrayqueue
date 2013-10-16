@@ -12,7 +12,7 @@ typedef struct
 
 arrayqueue_t* arrayqueue_new();
 
-bool arrayqueue_is_empty( arrayqueue_t * qu);
+int arrayqueue_is_empty( arrayqueue_t * qu);
 
 void *arrayqueue_peek( arrayqueue_t * qu);
 

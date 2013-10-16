@@ -29,13 +29,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <stdbool.h>
 #include <assert.h>
 #include "arrayqueue.h"
 
 #define INITIAL_CAPACITY 10
 #define in(x) ((aqueue_in_t*)x->in)
-#define ARRAYPOS(qu, idx) (((byte*)qu->array)[idx*in(qu)->elemSize])
+#define ARRAYPOS(me, idx) (((byte*)me->array)[idx*in(me)->elemSize])
 
 typedef struct
 {
@@ -48,66 +47,66 @@ typedef struct
  * Initialize anything we need to. */
 arrayqueue_t* arrayqueue_new()
 {
-    arrayqueue_t* qu;
+    arrayqueue_t* me;
 
-    qu = calloc(1,sizeof(arrayqueue_t));
-    qu->in = calloc(1,sizeof(aqueue_in_t));
-    in(qu)->arraySize = INITIAL_CAPACITY;
-    qu->array = calloc(1,sizeof(void *) * in(qu)->arraySize);
-    in(qu)->count = 0;
-    in(qu)->back = in(qu)->front = 0;
-    return qu;
+    me = calloc(1,sizeof(arrayqueue_t));
+    me->in = calloc(1,sizeof(aqueue_in_t));
+    in(me)->arraySize = INITIAL_CAPACITY;
+    me->array = calloc(1,sizeof(void *) * in(me)->arraySize);
+    in(me)->count = 0;
+    in(me)->back = in(me)->front = 0;
+    return me;
 }
 
 /**
  * Tell us if the queue is empty.
  * @return true if empty, else false */
-bool arrayqueue_is_empty(
-    arrayqueue_t * qu
+int arrayqueue_is_empty(
+    arrayqueue_t * me
 )
 {
-    return 0 == in(qu)->count;
+    return 0 == in(me)->count;
 }
 
 static void __ensurecapacity(
-    arrayqueue_t * qu
+    arrayqueue_t * me
 )
 {
     int ii, jj;
     const void **temp;
 
-    if (in(qu)->count < in(qu)->arraySize)
+    if (in(me)->count < in(me)->arraySize)
         return;
 
-    temp = calloc(1,sizeof(void *) * in(qu)->arraySize * 2);
+    temp = calloc(1,sizeof(void *) * in(me)->arraySize * 2);
 
-    for (ii = 0, jj = in(qu)->front; ii < in(qu)->count; ii++, jj++)
+    for (ii = 0, jj = in(me)->front; ii < in(me)->count; ii++, jj++)
     {
-        if (jj == in(qu)->arraySize)
+        if (jj == in(me)->arraySize)
             jj = 0;
-        temp[ii] = qu->array[jj];
+        temp[ii] = me->array[jj];
     }
 
     /* double capacity */
-    in(qu)->arraySize *= 2;
+    in(me)->arraySize *= 2;
 
     /* clean up old array */
-    free(qu->array);
+    free(me->array);
 
-    qu->array = temp;
-    in(qu)->front = 0;
-    in(qu)->back = in(qu)->count;
+    me->array = temp;
+    in(me)->front = 0;
+    in(me)->back = in(me)->count;
 }
 
 #if 0
 static void __checkwrapping(
-    arrayqueue_t * qu
+    arrayqueue_t * me
 )
 {
-    if (in(qu)->front == in(qu)->arraySize)
-        in(qu)->front = 0;
-    if (in(qu)->back == in(qu)->arraySize)
-        in(qu)->back = 0;
+    if (in(me)->front == in(me)->arraySize)
+        in(me)->front = 0;
+    if (in(me)->back == in(me)->arraySize)
+        in(me)->back = 0;
 }
 #endif
 
@@ -115,50 +114,50 @@ static void __checkwrapping(
  * Look at the oldest element in this queue.
  * @return the oldest element in this queue. */
 void *arrayqueue_peek(
-    arrayqueue_t * qu
+    arrayqueue_t * me
 )
 {
-    if (arrayqueue_is_empty(qu))
+    if (arrayqueue_is_empty(me))
         return NULL;
-    return ((void **) qu->array)[in(qu)->front];
+    return ((void **) me->array)[in(me)->front];
 }
 
 void *arrayqueue_peektail(
-    arrayqueue_t * qu
+    arrayqueue_t * me
 )
 {
     int pos;
 
-    if (arrayqueue_is_empty(qu))
+    if (arrayqueue_is_empty(me))
         return NULL;
 
     /* don't forget about wrapping */
-    pos = in(qu)->back - 1;
+    pos = in(me)->back - 1;
 
     if (pos < 0)
-        pos = in(qu)->arraySize - 1;
+        pos = in(me)->arraySize - 1;
 
-    return ((void **) qu->array)[pos];
+    return ((void **) me->array)[pos];
 }
 
 /**
  * Remove oldest element from queue.
  * @return oldest element of queue */
 void *arrayqueue_poll(
-    arrayqueue_t * qu
+    arrayqueue_t * me
 )
 {
     const void *elem;
 
-    if (arrayqueue_is_empty(qu))
+    if (arrayqueue_is_empty(me))
         return NULL;
 
-//    __checkwrapping(qu);
+//    __checkwrapping(me);
     
-    elem = qu->array[in(qu)->front];
+    elem = me->array[in(me)->front];
 
-    in(qu)->front++;
-    in(qu)->count--;
+    in(me)->front++;
+    in(me)->count--;
 
     return (void *) elem;
 }
@@ -168,59 +167,59 @@ void *arrayqueue_poll(
  * @param item : the value we add to the queue
  * @return 0 on success, -1 on failure */
 int arrayqueue_offer(
-    arrayqueue_t * qu,
+    arrayqueue_t * me,
     void *item
 )
 {
     assert(item);
-    assert(qu);
+    assert(me);
 
-//    __checkwrapping(qu);
-    __ensurecapacity(qu);
+//    __checkwrapping(me);
+    __ensurecapacity(me);
 
-    ((const void **) qu->array)[in(qu)->back] = item;
+    ((const void **) me->array)[in(me)->back] = item;
 
-    in(qu)->count++;
-    in(qu)->back++;
+    in(me)->count++;
+    in(me)->back++;
     return 0;
 }
 
 /**
  * Empty the queue. */
 void arrayqueue_empty(
-    arrayqueue_t * qu
+    arrayqueue_t * me
 )
 {
-    in(qu)->front = 0;
-    in(qu)->back = 0;
-    in(qu)->count = 0;
+    in(me)->front = 0;
+    in(me)->back = 0;
+    in(me)->count = 0;
 }
 
 void arrayqueue_free(
-    arrayqueue_t * qu
+    arrayqueue_t * me
 )
 {
-    free(qu->array);
-    free(qu->in);
-    free(qu);
+    free(me->array);
+    free(me->in);
+    free(me);
 }
 
 /**
  * How many elements are there in this queue? */
 int arrayqueue_count(
-    arrayqueue_t * qu
+    arrayqueue_t * me
 )
 {
-    return in(qu)->count;
+    return in(me)->count;
 }
 
 
 int arrayqueue_iterator_has_next(
-    arrayqueue_t* qu,
+    arrayqueue_t* me,
     arrayqueue_iterator_t* iter
 )
 {
-    if (iter->current == in(qu)->back)
+    if (iter->current == in(me)->back)
     {
         return 0;
     }
@@ -228,31 +227,31 @@ int arrayqueue_iterator_has_next(
 }
 
 void *arrayqueue_iterator_next(
-    arrayqueue_t* qu,
+    arrayqueue_t* me,
     arrayqueue_iterator_t* iter
 )
 {
-    if (!arrayqueue_iterator_has_next(qu,iter))
+    if (!arrayqueue_iterator_has_next(me,iter))
         return NULL;
 
-    if (iter->current == in(qu)->arraySize)
+    if (iter->current == in(me)->arraySize)
         iter->current = 0;
 
-    return (void *) qu->array[iter->current++];
+    return (void *) me->array[iter->current++];
 }
 
 int arrayqueue_iterator_has_next_reverse(
-    arrayqueue_t* qu,
+    arrayqueue_t* me,
     arrayqueue_iterator_t* iter
 )
 {
     int end;
     
-    end = in(qu)->front - 1;
+    end = in(me)->front - 1;
 
     if (end < 0)
     {
-        end = in(qu)->arraySize - 1;
+        end = in(me)->arraySize - 1;
     }
 
     if (iter->current == end)
@@ -264,40 +263,40 @@ int arrayqueue_iterator_has_next_reverse(
 }
 
 void *arrayqueue_iterator_next_reverse(
-    arrayqueue_t* qu,
+    arrayqueue_t* me,
     arrayqueue_iterator_t* iter
 )
 {
     void *val;
     
-    if (!arrayqueue_iterator_has_next_reverse(qu,iter))
+    if (!arrayqueue_iterator_has_next_reverse(me,iter))
         return NULL;
 
-    val = (void *) qu->array[iter->current];
+    val = (void *) me->array[iter->current];
 
     iter->current--;
     if (iter->current < 0)
     {
-        iter->current = in(qu)->arraySize - 1;
+        iter->current = in(me)->arraySize - 1;
     }
     return val;
 }
 
 void arrayqueue_iterator_reverse(
-    arrayqueue_t* qu,
+    arrayqueue_t* me,
     arrayqueue_iterator_t* iter
 )
 {
-    iter->current = in(qu)->back - 1;
+    iter->current = in(me)->back - 1;
     if (iter->current < 0)
-        iter->current = in(qu)->arraySize - 1;
+        iter->current = in(me)->arraySize - 1;
 }
 
 void arrayqueue_iterator(
-    arrayqueue_t * qu,
+    arrayqueue_t * me,
     arrayqueue_iterator_t * iter
 )
 {
-    iter->current = in(qu)->front;
+    iter->current = in(me)->front;
 }
 
