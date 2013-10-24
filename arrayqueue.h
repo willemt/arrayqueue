@@ -2,7 +2,7 @@
 typedef struct
 {
     void* in;
-    const void **array;
+    void **array;
 } arrayqueue_t;
 
 typedef struct
@@ -39,4 +39,6 @@ void *arrayqueue_iterator_next_reverse( arrayqueue_t* qu, arrayqueue_iterator_t*
 void arrayqueue_iterator_reverse( arrayqueue_t* qu, arrayqueue_iterator_t* iter);
 
 void arrayqueue_iterator( arrayqueue_t * qu, arrayqueue_iterator_t * iter);
+
+void* arrayqueue_get_from_idx(arrayqueue_t * me, int idx);
 

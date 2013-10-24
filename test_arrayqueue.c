@@ -131,3 +131,37 @@ void TestarrayQueue_fifo(
     arrayqueue_free(qu);
 }
 
+void TestarrayQueue_get_item_at_idx(
+    CuTest * tc
+)
+{
+    void *qu;
+
+    char *item = "testitem", *item2 = "testitem2";
+
+    qu = arrayqueue_new();
+
+    arrayqueue_offer(qu, item);
+    arrayqueue_offer(qu, item2);
+    CuAssertTrue(tc, item == arrayqueue_get_from_idx(qu,0));
+    CuAssertTrue(tc, item2 == arrayqueue_get_from_idx(qu,1));
+    arrayqueue_free(qu);
+}
+
+void TestarrayQueue_get_item_at_idx_after_poll(
+    CuTest * tc
+)
+{
+    void *qu;
+
+    char *item = "testitem", *item2 = "testitem2";
+
+    qu = arrayqueue_new();
+
+    arrayqueue_offer(qu, item);
+    arrayqueue_offer(qu, item2);
+    arrayqueue_poll(qu);
+    CuAssertTrue(tc, item2 == arrayqueue_get_from_idx(qu,0));
+    arrayqueue_free(qu);
+}
+

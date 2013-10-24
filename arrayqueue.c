@@ -73,7 +73,7 @@ static void __ensurecapacity(
 )
 {
     int ii, jj;
-    const void **temp;
+    void **temp;
 
     if (in(me)->count < in(me)->arraySize)
         return;
@@ -206,13 +206,15 @@ void arrayqueue_free(
 
 /**
  * How many elements are there in this queue? */
-int arrayqueue_count(
-    arrayqueue_t * me
-)
+int arrayqueue_count(arrayqueue_t * me)
 {
     return in(me)->count;
 }
 
+void* arrayqueue_get_from_idx(arrayqueue_t * me, int idx)
+{
+    return me->array[(in(me)->front + idx) % in(me)->arraySize];
+}
 
 int arrayqueue_iterator_has_next(
     arrayqueue_t* me,
