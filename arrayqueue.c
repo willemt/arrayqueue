@@ -33,15 +33,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "arrayqueue.h"
 
 #define INITIAL_CAPACITY 10
-#define in(x) ((aqueue_in_t*)x->in)
+#define in(x) ((aqueue_private_t*)x->in)
 #define ARRAYPOS(me, idx) (((byte*)me->array)[idx*in(me)->elemSize])
 
 typedef struct
 {
     int size;              /* size of array */
-    int count;                  /* the amount of elements in the array */
-    int front, back;            /* position of the queue */
-} aqueue_in_t;
+    int count;             /* the amount of elements in the array */
+    int front, back;       /* position of the queue */
+} aqueue_private_t;
 
 /**
  * Initialize anything we need to. */
@@ -50,7 +50,7 @@ arrayqueue_t* arrayqueue_new()
     arrayqueue_t* me;
 
     me = calloc(1,sizeof(arrayqueue_t));
-    me->in = calloc(1,sizeof(aqueue_in_t));
+    me->in = calloc(1,sizeof(aqueue_private_t));
     in(me)->size = INITIAL_CAPACITY;
     me->array = calloc(1,sizeof(void *) * in(me)->size);
     in(me)->count = 0;
