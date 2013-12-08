@@ -67,6 +67,22 @@ void TestarrayQueue_peekTailGetsTail(
     arrayqueue_free(qu);
 }
 
+void TestarrayQueue_pollTail(
+    CuTest * tc
+)
+{
+    void *qu;
+    char *item = "testitem";
+    char *item2 = "testitem2";
+
+    qu = arrayqueue_new();
+    arrayqueue_offer(qu, item);
+    arrayqueue_offer(qu, item2);
+    CuAssertTrue(tc, item2 == arrayqueue_polltail(qu));
+    CuAssertTrue(tc, 1 == arrayqueue_count(qu));
+    arrayqueue_free(qu);
+}
+
 void TestarrayQueue_EmptyEmptiesQueue(
     CuTest * tc
 )

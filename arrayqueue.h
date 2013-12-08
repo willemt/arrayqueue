@@ -18,6 +18,8 @@ void *arrayqueue_peek( arrayqueue_t * qu);
 
 void *arrayqueue_peektail( arrayqueue_t * qu);
 
+void *arrayqueue_polltail( arrayqueue_t * qu);
+
 void *arrayqueue_poll( arrayqueue_t * qu);
 
 int arrayqueue_offer( arrayqueue_t * qu, void *item);

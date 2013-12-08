@@ -38,7 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 typedef struct
 {
-    int arraySize;              /* size of array */
+    int size;              /* size of array */
     int count;                  /* the amount of elements in the array */
     int front, back;            /* position of the queue */
 } aqueue_in_t;
@@ -51,8 +51,8 @@ arrayqueue_t* arrayqueue_new()
 
     me = calloc(1,sizeof(arrayqueue_t));
     me->in = calloc(1,sizeof(aqueue_in_t));
-    in(me)->arraySize = INITIAL_CAPACITY;
-    me->array = calloc(1,sizeof(void *) * in(me)->arraySize);
+    in(me)->size = INITIAL_CAPACITY;
+    me->array = calloc(1,sizeof(void *) * in(me)->size);
     in(me)->count = 0;
     in(me)->back = in(me)->front = 0;
     return me;
@@ -75,20 +75,20 @@ static void __ensurecapacity(
     int ii, jj;
     void **temp;
 
-    if (in(me)->count < in(me)->arraySize)
+    if (in(me)->count < in(me)->size)
         return;
 
-    temp = calloc(1,sizeof(void *) * in(me)->arraySize * 2);
+    temp = calloc(1,sizeof(void *) * in(me)->size * 2);
 
     for (ii = 0, jj = in(me)->front; ii < in(me)->count; ii++, jj++)
     {
-        if (jj == in(me)->arraySize)
+        if (jj == in(me)->size)
             jj = 0;
         temp[ii] = me->array[jj];
     }
 
     /* double capacity */
-    in(me)->arraySize *= 2;
+    in(me)->size *= 2;
 
     /* clean up old array */
     free(me->array);
@@ -103,9 +103,9 @@ static void __checkwrapping(
     arrayqueue_t * me
 )
 {
-    if (in(me)->front == in(me)->arraySize)
+    if (in(me)->front == in(me)->size)
         in(me)->front = 0;
-    if (in(me)->back == in(me)->arraySize)
+    if (in(me)->back == in(me)->size)
         in(me)->back = 0;
 }
 #endif
@@ -131,11 +131,11 @@ void *arrayqueue_peektail(
     if (arrayqueue_is_empty(me))
         return NULL;
 
-    /* don't forget about wrapping */
     pos = in(me)->back - 1;
 
+    /* don't forget about wrapping */
     if (pos < 0)
-        pos = in(me)->arraySize - 1;
+        pos = in(me)->size - 1;
 
     return ((void **) me->array)[pos];
 }
@@ -158,6 +158,28 @@ void *arrayqueue_poll(
 
     in(me)->front++;
     in(me)->count--;
+
+    return (void *) elem;
+}
+
+/**
+ * Remove youngest element from queue.
+ * @return youngest element of queue */
+void *arrayqueue_polltail(
+    arrayqueue_t * me
+)
+{
+    const void *elem;
+
+    if (arrayqueue_is_empty(me))
+        return NULL;
+
+//    __checkwrapping(me);
+    in(me)->back--;
+    in(me)->count--;
+    if (-1 == in(me)->back)
+        in(me)->back = in(me)->size;
+    elem = me->array[in(me)->back];
 
     return (void *) elem;
 }
@@ -213,7 +235,7 @@ int arrayqueue_count(arrayqueue_t * me)
 
 void* arrayqueue_get_from_idx(arrayqueue_t * me, int idx)
 {
-    return me->array[(in(me)->front + idx) % in(me)->arraySize];
+    return me->array[(in(me)->front + idx) % in(me)->size];
 }
 
 int arrayqueue_iterator_has_next(
@@ -236,7 +258,7 @@ void *arrayqueue_iterator_next(
     if (!arrayqueue_iterator_has_next(me,iter))
         return NULL;
 
-    if (iter->current == in(me)->arraySize)
+    if (iter->current == in(me)->size)
         iter->current = 0;
 
     return (void *) me->array[iter->current++];
@@ -253,7 +275,7 @@ int arrayqueue_iterator_has_next_reverse(
 
     if (end < 0)
     {
-        end = in(me)->arraySize - 1;
+        end = in(me)->size - 1;
     }
 
     if (iter->current == end)
@@ -279,7 +301,7 @@ void *arrayqueue_iterator_next_reverse(
     iter->current--;
     if (iter->current < 0)
     {
-        iter->current = in(me)->arraySize - 1;
+        iter->current = in(me)->size - 1;
     }
     return val;
 }
@@ -291,7 +313,7 @@ void arrayqueue_iterator_reverse(
 {
     iter->current = in(me)->back - 1;
     if (iter->current < 0)
-        iter->current = in(me)->arraySize - 1;
+        iter->current = in(me)->size - 1;
 }
 
 void arrayqueue_iterator(
