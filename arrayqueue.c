@@ -47,6 +47,11 @@ int arrayqueue_is_empty(arrayqueue_t * me)
     return 0 == me->count;
 }
 
+int arrayqueue_is_full(arrayqueue_t * me)
+{
+    return me->size == me->count;
+}
+
 void arrayqueue_ensurecapacity(arrayqueue_t * me)
 {
     if (me->count < me->size)
@@ -97,12 +102,14 @@ void *arrayqueue_poll(arrayqueue_t * me)
     if (arrayqueue_is_empty(me))
         return NULL;
 
-    const void *elem = me->array[me->front];
+    void *elem = me->array[me->front];
 
     me->front++;
+    if (me->size == me->front)
+        me->front = 0;
     me->count--;
 
-    return (void *) elem;
+    return elem;
 }
 
 void *arrayqueue_polltail(arrayqueue_t * me)
@@ -120,11 +127,14 @@ void *arrayqueue_polltail(arrayqueue_t * me)
 
 int arrayqueue_offer(arrayqueue_t * me, void *item)
 {
-    if (me->count == me->size)
+    if (arrayqueue_is_full(me))
         return -1;
     ((const void **) me->array)[me->back] = item;
     me->count++;
     me->back++;
+
+    if (me->size == me->back)
+        me->back = 0;
     return 0;
 }
 
