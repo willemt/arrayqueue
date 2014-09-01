@@ -15,7 +15,7 @@ void TestarrayQueue_NewIsEmpty(
 {
     void *qu;
 
-    qu = arrayqueue_new();
+    qu = arrayqueue_new(10);
     CuAssertTrue(tc, arrayqueue_is_empty(qu));
     arrayqueue_free(qu);
 }
@@ -28,7 +28,7 @@ void TestarrayQueue_offer(
 
     char *item = "testitem";
 
-    qu = arrayqueue_new();
+    qu = arrayqueue_new(10);
 
     arrayqueue_offer(qu, item);
     CuAssertTrue(tc, 1 == arrayqueue_count(qu));
@@ -43,7 +43,7 @@ void TestarrayQueue_peekGetsHead(
     char *item = "testitem";
     char *item2 = "testitem2";
 
-    qu = arrayqueue_new();
+    qu = arrayqueue_new(10);
 
     arrayqueue_offer(qu, item);
     arrayqueue_offer(qu, item2);
@@ -59,7 +59,7 @@ void TestarrayQueue_peekTailGetsTail(
     char *item = "testitem";
     char *item2 = "testitem2";
 
-    qu = arrayqueue_new();
+    qu = arrayqueue_new(10);
 
     arrayqueue_offer(qu, item);
     arrayqueue_offer(qu, item2);
@@ -75,7 +75,7 @@ void TestarrayQueue_pollTail(
     char *item = "testitem";
     char *item2 = "testitem2";
 
-    qu = arrayqueue_new();
+    qu = arrayqueue_new(10);
     arrayqueue_offer(qu, item);
     arrayqueue_offer(qu, item2);
     CuAssertTrue(tc, item2 == arrayqueue_polltail(qu));
@@ -91,7 +91,7 @@ void TestarrayQueue_EmptyEmptiesQueue(
 
     char *item = "testitem";
 
-    qu = arrayqueue_new();
+    qu = arrayqueue_new(10);
 
     arrayqueue_offer(qu, item);
     arrayqueue_empty(qu);
@@ -108,7 +108,7 @@ void TestarrayQueue_cant_poll_with_no_contents(
 
     char *item = "testitem";
 
-    qu = arrayqueue_new();
+    qu = arrayqueue_new(10);
     arrayqueue_offer(qu, item);
     CuAssertTrue(tc, item == arrayqueue_poll(qu));
     CuAssertTrue(tc, 0 == arrayqueue_count(qu));
@@ -123,7 +123,7 @@ void TestarrayQueue_offer_and_poll_item(
 
     char *item = "testitem";
 
-    qu = arrayqueue_new();
+    qu = arrayqueue_new(10);
 
     arrayqueue_offer(qu, item);
     CuAssertTrue(tc, item == arrayqueue_poll(qu));
@@ -138,7 +138,7 @@ void TestarrayQueue_fifo(
 
     char *item = "testitem", *item2 = "testitem2";
 
-    qu = arrayqueue_new();
+    qu = arrayqueue_new(10);
 
     arrayqueue_offer(qu, item);
     arrayqueue_offer(qu, item2);
@@ -155,7 +155,7 @@ void TestarrayQueue_get_item_at_idx(
 
     char *item = "testitem", *item2 = "testitem2";
 
-    qu = arrayqueue_new();
+    qu = arrayqueue_new(10);
 
     arrayqueue_offer(qu, item);
     arrayqueue_offer(qu, item2);
@@ -172,7 +172,7 @@ void TestarrayQueue_get_item_at_idx_after_poll(
 
     char *item = "testitem", *item2 = "testitem2";
 
-    qu = arrayqueue_new();
+    qu = arrayqueue_new(10);
 
     arrayqueue_offer(qu, item);
     arrayqueue_offer(qu, item2);
