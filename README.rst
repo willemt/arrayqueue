@@ -1,5 +1,5 @@
-.. image:: https://travis-ci.org/willemt/heap.png
-   :target: https://travis-ci.org/willemt/heap
+.. image:: https://travis-ci.org/willemt/arrayqueue.png
+   :target: https://travis-ci.org/willemt/arrayqueue
 
 What?
 -----
