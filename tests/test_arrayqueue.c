@@ -150,7 +150,11 @@ void TestarrayQueue_poll_offer_past_boundary(
     arrayqueue_offer(qu, item1);
     arrayqueue_offer(qu, item2);
     CuAssertTrue(tc, item1 == arrayqueue_poll(qu));
+    CuAssertTrue(tc, item2 == arrayqueue_peek(qu));
+    CuAssertTrue(tc, item2 == arrayqueue_peektail(qu));
     arrayqueue_offer(qu, item3);
+    CuAssertTrue(tc, item2 == arrayqueue_peek(qu));
+    CuAssertTrue(tc, item3 == arrayqueue_peektail(qu));
     CuAssertTrue(tc, item2 == arrayqueue_poll(qu));
     CuAssertTrue(tc, item3 == arrayqueue_poll(qu));
     arrayqueue_free(qu);
