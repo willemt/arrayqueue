@@ -10,60 +10,72 @@
 #include <assert.h>
 #include "arrayqueue.h"
 
-arrayqueue_t* arrayqueue_new(unsigned int size)
+void aqueue_init(arrayqueue_t* me, unsigned int size)
 {
-    arrayqueue_t* me = calloc(1, sizeof(arrayqueue_t));
-    me->array = calloc(1, sizeof(void *) * size);
     me->size = size;
     me->count = 0;
     me->back = me->front = 0;
+}
+
+arrayqueue_t* aqueue_new(unsigned int size)
+{
+    arrayqueue_t *me = malloc(aqueue_sizeof(size));
+
+    if (!me)
+        return NULL;
+
+    aqueue_init(me, size);
+
     return me;
 }
 
-int arrayqueue_is_empty(arrayqueue_t * me)
+size_t aqueue_sizeof(unsigned int size)
+{
+    return sizeof(arrayqueue_t) + size * sizeof(void *);
+}
+
+int aqueue_is_empty(const arrayqueue_t * me)
 {
     return 0 == me->count;
 }
 
-int arrayqueue_is_full(arrayqueue_t * me)
+int aqueue_is_full(arrayqueue_t * me)
 {
     return me->size == me->count;
 }
 
-void arrayqueue_ensurecapacity(arrayqueue_t * me)
+static arrayqueue_t* __ensurecapacity(arrayqueue_t * me)
 {
     if (me->count < me->size)
-        return;
+        return me;
 
-    void **temp = calloc(1, sizeof(void *) * me->size * 2);
+    arrayqueue_t *new = malloc(aqueue_sizeof(me->size * 2));
 
     int ii, jj;
     for (ii = 0, jj = me->front; ii < me->count; ii++, jj++)
     {
         if (jj == me->size)
             jj = 0;
-        temp[ii] = me->array[jj];
+        new->array[ii] = me->array[jj];
     }
 
-    me->size *= 2;
-
-    free(me->array);
-
-    me->array = temp;
-    me->front = 0;
-    me->back = me->count;
+    new->size = me->size * 2;
+    new->front = 0;
+    new->count = new->back = me->count;
+    free(me);
+    return new;
 }
 
-void *arrayqueue_peek(arrayqueue_t * me)
+void *aqueue_peek(const arrayqueue_t * me)
 {
-    if (arrayqueue_is_empty(me))
+    if (aqueue_is_empty(me))
         return NULL;
     return ((void**)me->array)[me->front];
 }
 
-void *arrayqueue_peektail(arrayqueue_t * me)
+void *aqueue_peektail(const arrayqueue_t * me)
 {
-    if (arrayqueue_is_empty(me))
+    if (aqueue_is_empty(me))
         return NULL;
 
     int pos = me->back - 1;
@@ -75,9 +87,9 @@ void *arrayqueue_peektail(arrayqueue_t * me)
     return ((void**)me->array)[pos];
 }
 
-void *arrayqueue_poll(arrayqueue_t * me)
+void *aqueue_poll(arrayqueue_t * me)
 {
-    if (arrayqueue_is_empty(me))
+    if (aqueue_is_empty(me))
         return NULL;
 
     void *elem = me->array[me->front];
@@ -90,9 +102,9 @@ void *arrayqueue_poll(arrayqueue_t * me)
     return elem;
 }
 
-void *arrayqueue_polltail(arrayqueue_t * me)
+void *aqueue_polltail(arrayqueue_t * me)
 {
-    if (arrayqueue_is_empty(me))
+    if (aqueue_is_empty(me))
         return NULL;
 
     me->back--;
@@ -103,10 +115,25 @@ void *arrayqueue_polltail(arrayqueue_t * me)
     return me->array[me->back];
 }
 
-int arrayqueue_offer(arrayqueue_t * me, void *item)
+int aqueue_offerensure(arrayqueue_t **me, void *item)
 {
-    if (arrayqueue_is_full(me))
+    if (NULL == (*me = __ensurecapacity(*me)))
         return -1;
+
+    ((const void**)(*me)->array)[(*me)->back] = item;
+    (*me)->count++;
+    (*me)->back++;
+
+    if (!aqueue_is_full(*me) && (*me)->size == (*me)->back)
+        (*me)->back = 0;
+    return 0;
+}
+
+int aqueue_offer(arrayqueue_t *me, void *item)
+{
+    if (aqueue_is_full(me))
+        return -1;
+
     ((const void**)me->array)[me->back] = item;
     me->count++;
     me->back++;
@@ -116,37 +143,41 @@ int arrayqueue_offer(arrayqueue_t * me, void *item)
     return 0;
 }
 
-void arrayqueue_empty(arrayqueue_t * me)
+void aqueue_empty(arrayqueue_t * me)
 {
     me->front = me->back = me->count = 0;
 }
 
-void arrayqueue_free(arrayqueue_t * me)
+void aqueue_free(arrayqueue_t * me)
 {
-    free(me->array);
     free(me);
 }
 
-int arrayqueue_count(arrayqueue_t * me)
+int aqueue_count(const arrayqueue_t * me)
 {
     return me->count;
 }
 
-void* arrayqueue_get_from_idx(arrayqueue_t * me, int idx)
+int aqueue_size(const arrayqueue_t * me)
+{
+    return me->count;
+}
+
+void* aqueue_get_from_idx(arrayqueue_t * me, int idx)
 {
     return me->array[(me->front + idx) % me->size];
 }
 
-int arrayqueue_iterator_has_next(arrayqueue_t* me, arrayqueue_iterator_t* iter)
+int aqueue_iter_has_next(arrayqueue_t* me, arrayqueue_iter_t* iter)
 {
     if (iter->current == me->back)
         return 0;
     return 1;
 }
 
-void *arrayqueue_iterator_next(arrayqueue_t* me, arrayqueue_iterator_t* iter)
+void *aqueue_iter_next(arrayqueue_t* me, arrayqueue_iter_t* iter)
 {
-    if (!arrayqueue_iterator_has_next(me, iter))
+    if (!aqueue_iter_has_next(me, iter))
         return NULL;
 
     if (iter->current == me->size)
@@ -155,8 +186,8 @@ void *arrayqueue_iterator_next(arrayqueue_t* me, arrayqueue_iterator_t* iter)
     return (void*)me->array[iter->current++];
 }
 
-int arrayqueue_iterator_has_next_reverse(arrayqueue_t* me,
-                                         arrayqueue_iterator_t* iter)
+int aqueue_iter_has_next_reverse(arrayqueue_t* me,
+                                 arrayqueue_iter_t* iter)
 {
     int end = me->front - 1;
 
@@ -169,10 +200,10 @@ int arrayqueue_iterator_has_next_reverse(arrayqueue_t* me,
     return 1;
 }
 
-void *arrayqueue_iterator_next_reverse(arrayqueue_t* me,
-                                       arrayqueue_iterator_t* iter)
+void *aqueue_iter_next_reverse(arrayqueue_t* me,
+                               arrayqueue_iter_t* iter)
 {
-    if (!arrayqueue_iterator_has_next_reverse(me, iter))
+    if (!aqueue_iter_has_next_reverse(me, iter))
         return NULL;
 
     void *val = (void*)me->array[iter->current];
@@ -183,14 +214,14 @@ void *arrayqueue_iterator_next_reverse(arrayqueue_t* me,
     return val;
 }
 
-void arrayqueue_iterator_reverse(arrayqueue_t* me, arrayqueue_iterator_t* iter)
+void aqueue_iter_reverse(arrayqueue_t* me, arrayqueue_iter_t* iter)
 {
     iter->current = me->back - 1;
     if (iter->current < 0)
         iter->current = me->size - 1;
 }
 
-void arrayqueue_iterator(arrayqueue_t * me, arrayqueue_iterator_t * iter)
+void aqueue_iter(arrayqueue_t * me, arrayqueue_iter_t * iter)
 {
     iter->current = me->front;
 }
