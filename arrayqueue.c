@@ -1,31 +1,9 @@
-/*
- 
-Copyright (c) 2006, Willem-Hendrik Thiart
-All rights reserved.
 
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
-    * Redistributions of source code must retain the above copyright
-      notice, this list of conditions and the following disclaimer.
-    * Redistributions in binary form must reproduce the above copyright
-      notice, this list of conditions and the following disclaimer in the
-      documentation and/or other materials provided with the distribution.
-    * The names of its contributors may not be used to endorse or promote
-      products derived from this software without specific prior written
-      permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL WILLEM-HENDRIK THIART BE LIABLE FOR ANY
-DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-*/
+/**
+ * Copyright (c) 2014, Willem-Hendrik Thiart
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -34,8 +12,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 arrayqueue_t* arrayqueue_new(unsigned int size)
 {
-    arrayqueue_t* me = calloc(1,sizeof(arrayqueue_t));
-    me->array = calloc(1,sizeof(void *) * size);
+    arrayqueue_t* me = calloc(1, sizeof(arrayqueue_t));
+    me->array = calloc(1, sizeof(void *) * size);
     me->size = size;
     me->count = 0;
     me->back = me->front = 0;
@@ -57,7 +35,7 @@ void arrayqueue_ensurecapacity(arrayqueue_t * me)
     if (me->count < me->size)
         return;
 
-    void **temp = calloc(1,sizeof(void *) * me->size * 2);
+    void **temp = calloc(1, sizeof(void *) * me->size * 2);
 
     int ii, jj;
     for (ii = 0, jj = me->front; ii < me->count; ii++, jj++)
@@ -80,7 +58,7 @@ void *arrayqueue_peek(arrayqueue_t * me)
 {
     if (arrayqueue_is_empty(me))
         return NULL;
-    return ((void **) me->array)[me->front];
+    return ((void**)me->array)[me->front];
 }
 
 void *arrayqueue_peektail(arrayqueue_t * me)
@@ -94,7 +72,7 @@ void *arrayqueue_peektail(arrayqueue_t * me)
     if (pos < 0)
         pos = me->size - 1;
 
-    return ((void **) me->array)[pos];
+    return ((void**)me->array)[pos];
 }
 
 void *arrayqueue_poll(arrayqueue_t * me)
@@ -129,7 +107,7 @@ int arrayqueue_offer(arrayqueue_t * me, void *item)
 {
     if (arrayqueue_is_full(me))
         return -1;
-    ((const void **) me->array)[me->back] = item;
+    ((const void**)me->array)[me->back] = item;
     me->count++;
     me->back++;
 
@@ -162,52 +140,46 @@ void* arrayqueue_get_from_idx(arrayqueue_t * me, int idx)
 int arrayqueue_iterator_has_next(arrayqueue_t* me, arrayqueue_iterator_t* iter)
 {
     if (iter->current == me->back)
-    {
         return 0;
-    }
     return 1;
 }
 
 void *arrayqueue_iterator_next(arrayqueue_t* me, arrayqueue_iterator_t* iter)
 {
-    if (!arrayqueue_iterator_has_next(me,iter))
+    if (!arrayqueue_iterator_has_next(me, iter))
         return NULL;
 
     if (iter->current == me->size)
         iter->current = 0;
 
-    return (void *) me->array[iter->current++];
+    return (void*)me->array[iter->current++];
 }
 
-int arrayqueue_iterator_has_next_reverse(arrayqueue_t* me, arrayqueue_iterator_t* iter)
+int arrayqueue_iterator_has_next_reverse(arrayqueue_t* me,
+                                         arrayqueue_iterator_t* iter)
 {
     int end = me->front - 1;
 
     if (end < 0)
-    {
         end = me->size - 1;
-    }
 
     if (iter->current == end)
-    {
         return 0;
-    }
 
     return 1;
 }
 
-void *arrayqueue_iterator_next_reverse(arrayqueue_t* me, arrayqueue_iterator_t* iter)
+void *arrayqueue_iterator_next_reverse(arrayqueue_t* me,
+                                       arrayqueue_iterator_t* iter)
 {
-    if (!arrayqueue_iterator_has_next_reverse(me,iter))
+    if (!arrayqueue_iterator_has_next_reverse(me, iter))
         return NULL;
 
-    void *val = (void *) me->array[iter->current];
+    void *val = (void*)me->array[iter->current];
 
     iter->current--;
     if (iter->current < 0)
-    {
         iter->current = me->size - 1;
-    }
     return val;
 }
 
@@ -222,4 +194,3 @@ void arrayqueue_iterator(arrayqueue_t * me, arrayqueue_iterator_t * iter)
 {
     iter->current = me->front;
 }
-
