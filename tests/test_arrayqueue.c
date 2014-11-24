@@ -13,9 +13,9 @@ void TestarrayQueue_new_is_empty(
     CuTest * tc
     )
 {
-    void *qu = aqueue_new(10);
-    CuAssertTrue(tc, aqueue_is_empty(qu));
-    aqueue_free(qu);
+    void *qu = aqueuenp_new(10, 1);
+    CuAssertTrue(tc, aqueuenp_is_empty(qu));
+    aqueuenp_free(qu);
 }
 
 void TestarrayQueue_offer_adds_new_item(
@@ -23,11 +23,11 @@ void TestarrayQueue_offer_adds_new_item(
     )
 {
     char *item = "testitem";
-    void *qu = aqueue_new(10);
+    void *qu = aqueuenp_new(10, 8);
 
-    aqueue_offer(qu, item);
-    CuAssertTrue(tc, 1 == aqueue_count(qu));
-    aqueue_free(qu);
+    aqueuenp_offer(qu, item);
+    CuAssertTrue(tc, 1 == aqueuenp_count(qu));
+    aqueuenp_free(qu);
 }
 
 void TestarrayQueue_cannot_offer_over_capacity(
@@ -35,55 +35,26 @@ void TestarrayQueue_cannot_offer_over_capacity(
     )
 {
     char *item = "testitem";
-    void *qu = aqueue_new(1);
+    void *qu = aqueuenp_new(1, 8);
 
-    aqueue_offer(qu, item);
-    CuAssertTrue(tc, -1 == aqueue_offer(qu, item));
-    CuAssertTrue(tc, 1 == aqueue_count(qu));
-    aqueue_free(qu);
+    aqueuenp_offer(qu, item);
+    CuAssertTrue(tc, -1 == aqueuenp_offer(qu, item));
+    CuAssertTrue(tc, 1 == aqueuenp_count(qu));
+    aqueuenp_free(qu);
 }
 
 void TestarrayQueue_peek_gets_head(
     CuTest * tc
     )
 {
-    char *item = "testitem";
+    char *item1 = "testitem1";
     char *item2 = "testitem2";
-    void *qu = aqueue_new(10);
+    void *qu = aqueuenp_new(10, 9);
 
-    aqueue_offer(qu, item);
-    aqueue_offer(qu, item2);
-    CuAssertTrue(tc, item == aqueue_peek(qu));
-    aqueue_free(qu);
-}
-
-void TestarrayQueue_peek_tail_gets_tail(
-    CuTest * tc
-    )
-{
-    char *item = "testitem";
-    char *item2 = "testitem2";
-    void *qu = aqueue_new(10);
-
-    aqueue_offer(qu, item);
-    aqueue_offer(qu, item2);
-    CuAssertTrue(tc, item2 == aqueue_peektail(qu));
-    aqueue_free(qu);
-}
-
-void TestarrayQueue_poll_tail(
-    CuTest * tc
-    )
-{
-    char *item = "testitem";
-    char *item2 = "testitem2";
-    void *qu = aqueue_new(10);
-
-    aqueue_offer(qu, item);
-    aqueue_offer(qu, item2);
-    CuAssertTrue(tc, item2 == aqueue_polltail(qu));
-    CuAssertTrue(tc, 1 == aqueue_count(qu));
-    aqueue_free(qu);
+    aqueuenp_offer(qu, item1);
+    aqueuenp_offer(qu, item2);
+    CuAssertTrue(tc, 0 == strncmp(item1, aqueuenp_peek(qu), 9));
+    aqueuenp_free(qu);
 }
 
 void TestarrayQueue_empty_empties_queue(
@@ -91,13 +62,13 @@ void TestarrayQueue_empty_empties_queue(
     )
 {
     char *item = "testitem";
-    void *qu = aqueue_new(10);
+    void *qu = aqueuenp_new(10, 8);
 
-    aqueue_offer(qu, item);
-    aqueue_empty(qu);
-    CuAssertTrue(tc, 0 == aqueue_count(qu));
-    CuAssertTrue(tc, aqueue_is_empty(qu));
-    aqueue_free(qu);
+    aqueuenp_offer(qu, item);
+    aqueuenp_empty(qu);
+    CuAssertTrue(tc, 0 == aqueuenp_count(qu));
+    CuAssertTrue(tc, aqueuenp_is_empty(qu));
+    aqueuenp_free(qu);
 }
 
 void TestarrayQueue_cant_poll_with_no_contents(
@@ -105,11 +76,12 @@ void TestarrayQueue_cant_poll_with_no_contents(
     )
 {
     char *item = "testitem";
-    void *qu = aqueue_new(10);
-    aqueue_offer(qu, item);
-    CuAssertTrue(tc, item == aqueue_poll(qu));
-    CuAssertTrue(tc, 0 == aqueue_count(qu));
-    aqueue_free(qu);
+    void *qu = aqueuenp_new(10, 8);
+    aqueuenp_offer(qu, item);
+    CuAssertTrue(tc, 0 == strncmp(item, aqueuenp_peek(qu), 8));
+    CuAssertTrue(tc, 0 == aqueuenp_poll(qu));
+    CuAssertTrue(tc, 0 == aqueuenp_count(qu));
+    aqueuenp_free(qu);
 }
 
 void TestarrayQueue_offer_and_poll_item(
@@ -117,25 +89,28 @@ void TestarrayQueue_offer_and_poll_item(
     )
 {
     char *item = "testitem";
-    void *qu = aqueue_new(10);
+    void *qu = aqueuenp_new(10, 8);
 
-    aqueue_offer(qu, item);
-    CuAssertTrue(tc, item == aqueue_poll(qu));
-    aqueue_free(qu);
+    aqueuenp_offer(qu, item);
+    CuAssertTrue(tc, 0 == strncmp(item, aqueuenp_peek(qu), 8));
+    CuAssertTrue(tc, 0 == aqueuenp_poll(qu));
+    aqueuenp_free(qu);
 }
 
 void TestarrayQueue_fifo(
     CuTest * tc
     )
 {
-    char *item = "testitem", *item2 = "testitem2";
-    void *qu = aqueue_new(10);
+    char *item = "testitem1", *item2 = "testitem2";
+    void *qu = aqueuenp_new(10, 9);
 
-    aqueue_offer(qu, item);
-    aqueue_offer(qu, item2);
-    CuAssertTrue(tc, item == aqueue_poll(qu));
-    CuAssertTrue(tc, item2 == aqueue_poll(qu));
-    aqueue_free(qu);
+    aqueuenp_offer(qu, item);
+    aqueuenp_offer(qu, item2);
+    CuAssertTrue(tc, 0 == strncmp(item, aqueuenp_peek(qu), 9));
+    CuAssertTrue(tc, 0 == aqueuenp_poll(qu));
+    CuAssertTrue(tc, 0 == strncmp(item2, aqueuenp_peek(qu), 9));
+    CuAssertTrue(tc, 0 == aqueuenp_poll(qu));
+    aqueuenp_free(qu);
 }
 
 void TestarrayQueue_poll_offer_past_boundary(
@@ -145,47 +120,19 @@ void TestarrayQueue_poll_offer_past_boundary(
     char *item1 = "testitem1";
     char *item2 = "testitem2";
     char *item3 = "testitem3";
-    void *qu = aqueue_new(2);
+    void *qu = aqueuenp_new(2, 9);
 
-    aqueue_offer(qu, item1);
-    aqueue_offer(qu, item2);
-    CuAssertTrue(tc, item1 == aqueue_poll(qu));
-    CuAssertTrue(tc, item2 == aqueue_peek(qu));
-    CuAssertTrue(tc, item2 == aqueue_peektail(qu));
-    aqueue_offer(qu, item3);
-    CuAssertTrue(tc, item2 == aqueue_peek(qu));
-    CuAssertTrue(tc, item3 == aqueue_peektail(qu));
-    CuAssertTrue(tc, item2 == aqueue_poll(qu));
-    CuAssertTrue(tc, item3 == aqueue_poll(qu));
-    aqueue_free(qu);
-}
-
-void TestarrayQueue_get_item_at_idx(
-    CuTest * tc
-    )
-{
-    char *item = "testitem", *item2 = "testitem2";
-    void *qu = aqueue_new(10);
-
-    aqueue_offer(qu, item);
-    aqueue_offer(qu, item2);
-    CuAssertTrue(tc, item == aqueue_get_from_idx(qu, 0));
-    CuAssertTrue(tc, item2 == aqueue_get_from_idx(qu, 1));
-    aqueue_free(qu);
-}
-
-void TestarrayQueue_get_item_at_idx_after_poll(
-    CuTest * tc
-    )
-{
-    char *item = "testitem", *item2 = "testitem2";
-    void *qu = aqueue_new(10);
-
-    aqueue_offer(qu, item);
-    aqueue_offer(qu, item2);
-    aqueue_poll(qu);
-    CuAssertTrue(tc, item2 == aqueue_get_from_idx(qu, 0));
-    aqueue_free(qu);
+    aqueuenp_offer(qu, item1);
+    aqueuenp_offer(qu, item2);
+    CuAssertTrue(tc, 0 == strncmp(item1, aqueuenp_peek(qu), 9));
+    CuAssertTrue(tc, 0 == aqueuenp_poll(qu));
+    CuAssertTrue(tc, 0 == strncmp(item2, aqueuenp_peek(qu), 9));
+    aqueuenp_offer(qu, item3);
+    CuAssertTrue(tc, 0 == strncmp(item2, aqueuenp_peek(qu), 9));
+    CuAssertTrue(tc, 0 == aqueuenp_poll(qu));
+    CuAssertTrue(tc, 0 == strncmp(item3, aqueuenp_peek(qu), 9));
+    CuAssertTrue(tc, 0 == aqueuenp_poll(qu));
+    aqueuenp_free(qu);
 }
 
 void TestarrayQueue_offerensure_ensures_capacity(
@@ -193,13 +140,13 @@ void TestarrayQueue_offerensure_ensures_capacity(
     )
 {
     char *item = "testitem";
-    arrayqueue_t *qu = aqueue_new(1);
+    arrayqueuenp_t *qu = aqueuenp_new(1, 8);
 
-    CuAssertTrue(tc, 0 == aqueue_offerensure(&qu, item));
-    CuAssertTrue(tc, 1 == aqueue_count(qu));
-    CuAssertTrue(tc, 1 == aqueue_size(qu));
-    CuAssertTrue(tc, 0 == aqueue_offerensure(&qu, item));
-    CuAssertTrue(tc, 2 == aqueue_count(qu));
-    CuAssertTrue(tc, 2 == aqueue_size(qu));
-    aqueue_free(qu);
+    CuAssertTrue(tc, 0 == aqueuenp_offerensure(&qu, item));
+    CuAssertTrue(tc, 1 == aqueuenp_count(qu));
+    CuAssertTrue(tc, 1 == aqueuenp_size(qu));
+    CuAssertTrue(tc, 0 == aqueuenp_offerensure(&qu, item));
+    CuAssertTrue(tc, 2 == aqueuenp_count(qu));
+    CuAssertTrue(tc, 2 == aqueuenp_size(qu));
+    aqueuenp_free(qu);
 }
