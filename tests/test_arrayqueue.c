@@ -150,3 +150,24 @@ void TestarrayQueue_offerensure_ensures_capacity(
     CuAssertTrue(tc, 2 == aqueue_size(qu));
     aqueue_free(qu);
 }
+
+void TestarrayQueue_iterator_iterates(
+    CuTest * tc
+    )
+{
+    char *item = "testitem";
+    char *item2 = "TESTITEM";
+    arrayqueue_t *qu = aqueue_new(1, 8);
+
+    CuAssertTrue(tc, 0 == aqueue_offerensure(&qu, item));
+    CuAssertTrue(tc, 0 == aqueue_offerensure(&qu, item2));
+
+    arrayqueue_iter_t iter;
+    aqueue_iter(qu, &iter);
+    CuAssertTrue(tc, 1 == aqueue_iter_has_next(qu, &iter));
+    CuAssertTrue(tc, 0 == strncmp(item, aqueue_iter_next(qu, &iter), 8));
+    CuAssertTrue(tc, 1 == aqueue_iter_has_next(qu, &iter));
+    CuAssertTrue(tc, 0 == strncmp(item2, aqueue_iter_next(qu, &iter), 8));
+    CuAssertTrue(tc, 0 == aqueue_iter_has_next(qu, &iter));
+    aqueue_free(qu);
+}
