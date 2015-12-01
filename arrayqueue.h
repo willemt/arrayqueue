@@ -1,5 +1,5 @@
-#ifndef ARRAYQUEUENP_H
-#define ARRAYQUEUENP_H
+#ifndef ARRAYqueue_H
+#define ARRAYqueue_H
 
 typedef struct
 {
@@ -8,7 +8,7 @@ typedef struct
     size_t count;       /* the amount of items in the array */
     size_t front, back; /* position of the queue */
     void *array[];
-} arrayqueuenp_t;
+} arrayqueue_t;
 
 typedef struct
 {
@@ -22,7 +22,7 @@ typedef struct
  *
  * @param[in] size Initial size of queue
  * @return initialised queue */
-arrayqueuenp_t* aqueuenp_new(size_t size, size_t m_size);
+arrayqueue_t* aqueue_new(size_t size, size_t m_size);
 
 /**
  * Create a new data structure and initialise it.
@@ -31,27 +31,27 @@ arrayqueuenp_t* aqueuenp_new(size_t size, size_t m_size);
  *
  * @param[in] size Initial size of queue
  * @return initialised queue */
-void aqueuenp_init(arrayqueuenp_t* qu, size_t size, size_t m_size);
+void aqueue_init(arrayqueue_t* qu, size_t size, size_t m_size);
 
 /**
  * @return number of bytes needed for a queue of this size. */
-size_t aqueuenp_sizeof(size_t size, size_t m_size);
+size_t aqueue_sizeof(size_t size, size_t m_size);
 
 /**
  * Is the queue empty?
  *
  * @return 1 if empty; otherwise 0 */
-int aqueuenp_is_empty(const arrayqueuenp_t * qu);
+int aqueue_is_empty(const arrayqueue_t * qu);
 
 /**
  * @return oldest item in this queue. */
-void *aqueuenp_peek(arrayqueuenp_t * qu);
+void *aqueue_peek(arrayqueue_t * qu);
 
 /**
  * Remove oldest item from queue.
  *
  * @return 0 on sucess; -1 on failure */
-int aqueuenp_poll(arrayqueuenp_t * qu);
+int aqueue_poll(arrayqueue_t * qu);
 
 /**
  * Add item
@@ -65,7 +65,7 @@ int aqueuenp_poll(arrayqueuenp_t * qu);
  * @param[in/out] qu_ptr Pointer to the queue. Changed when queue is enlarged.
  * @param[in] item The item to be added
  * @return 0 on success; -1 on failure */
-int aqueuenp_offerensure(arrayqueuenp_t ** qu_ptr, void *item);
+int aqueue_offerensure(arrayqueue_t ** qu_ptr, void *item);
 
 /**
  * Add item
@@ -77,30 +77,30 @@ int aqueuenp_offerensure(arrayqueuenp_t ** qu_ptr, void *item);
  *
  * @param[in] item The item to be added
  * @return 0 on success; -1 on error */
-int aqueuenp_offer(arrayqueuenp_t * qu, void *item);
+int aqueue_offer(arrayqueue_t * qu, void *item);
 
 /**
  * Empty the queue */
-void aqueuenp_empty(arrayqueuenp_t * qu);
+void aqueue_empty(arrayqueue_t * qu);
 
-void aqueuenp_free(arrayqueuenp_t * qu);
+void aqueue_free(arrayqueue_t * qu);
 
 /**
  * @return number of items */
-int aqueuenp_count(const arrayqueuenp_t * qu);
+int aqueue_count(const arrayqueue_t * qu);
 
-int aqueuenp_size(const arrayqueuenp_t * qu);
+int aqueue_size(const arrayqueue_t * qu);
 
-int aqueuenp_iter_has_next(arrayqueuenp_t* qu, arrayqueue_iter_t* iter);
+int aqueue_iter_has_next(arrayqueue_t* qu, arrayqueue_iter_t* iter);
 
-void *aqueuenp_iter_next(arrayqueuenp_t* qu, arrayqueue_iter_t* iter);
+void *aqueue_iter_next(arrayqueue_t* qu, arrayqueue_iter_t* iter);
 
-int aqueuenp_iter_has_next_reverse(arrayqueuenp_t* qu, arrayqueue_iter_t* iter);
+int aqueue_iter_has_next_reverse(arrayqueue_t* qu, arrayqueue_iter_t* iter);
 
-void *aqueuenp_iter_next_reverse(arrayqueuenp_t* qu, arrayqueue_iter_t* iter);
+void *aqueue_iter_next_reverse(arrayqueue_t* qu, arrayqueue_iter_t* iter);
 
-void aqueuenp_iter_reverse(arrayqueuenp_t* qu, arrayqueue_iter_t* iter);
+void aqueue_iter_reverse(arrayqueue_t* qu, arrayqueue_iter_t* iter);
 
-void aqueuenp_iter(arrayqueuenp_t * qu, arrayqueue_iter_t * iter);
+void aqueue_iter(arrayqueue_t * qu, arrayqueue_iter_t * iter);
 
-#endif /* ARRAYQUEUENP_H */
+#endif /* ARRAYqueue_H */
