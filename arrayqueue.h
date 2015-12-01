@@ -7,7 +7,6 @@ typedef struct
     size_t size;        /* size of array */
     size_t count;       /* the amount of items in the array */
     size_t front, back; /* position of the queue */
-    void *array[];
 } arrayqueue_t;
 
 typedef struct

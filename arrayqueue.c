@@ -19,6 +19,11 @@ void aqueue_init(arrayqueue_t* me, size_t size, size_t m_size)
     me->back = me->front = 0;
 }
 
+void* aqueue_array(arrayqueue_t* me)
+{
+    return (void*)me + sizeof(arrayqueue_t);
+}
+
 arrayqueue_t* aqueue_new(size_t size, size_t m_size)
 {
     arrayqueue_t *me = malloc(aqueue_sizeof(size, m_size));
@@ -58,7 +63,7 @@ static arrayqueue_t* __ensurecapacity(arrayqueue_t * me)
     {
         if (jj == me->size)
             jj = 0;
-        memcpy(new->array + ii * me->m_size, me->array + jj * me->m_size,
+        memcpy(aqueue_array(new) + ii * me->m_size, aqueue_array(me) + jj * me->m_size,
                me->m_size);
     }
 
@@ -74,7 +79,7 @@ void *aqueue_peek(arrayqueue_t * me)
 {
     if (aqueue_is_empty(me))
         return NULL;
-    return me->array + me->front * me->m_size;
+    return aqueue_array(me) + me->front * me->m_size;
 }
 
 int aqueue_poll(arrayqueue_t * me)
@@ -96,7 +101,7 @@ int aqueue_offerensure(arrayqueue_t **me_ptr, void *item)
 
     arrayqueue_t* me = *me_ptr;
 
-    memcpy(me->array + me->back * me->m_size, item, me->m_size);
+    memcpy(aqueue_array(me) + me->back * me->m_size, item, me->m_size);
     me->count++;
     me->back++;
 
@@ -110,7 +115,7 @@ int aqueue_offer(arrayqueue_t *me, void *item)
     if (aqueue_is_full(me))
         return -1;
 
-    memcpy(me->array + me->back * me->m_size, item, me->m_size);
+    memcpy(aqueue_array(me) + me->back * me->m_size, item, me->m_size);
     me->count++;
     me->back++;
 
@@ -141,7 +146,7 @@ int aqueue_size(const arrayqueue_t * me)
 
 void* aqueue_get_from_idx(arrayqueue_t * me, int idx)
 {
-    return me->array + ((me->front + idx) % me->size) * me->m_size;
+    return aqueue_array(me) + ((me->front + idx) % me->size) * me->m_size;
 }
 
 int aqueue_iter_has_next(arrayqueue_t* me, arrayqueue_iter_t* iter)
@@ -159,7 +164,7 @@ void *aqueue_iter_next(arrayqueue_t* me, arrayqueue_iter_t* iter)
     if (iter->current == (int)me->size)
         iter->current = 0;
 
-    void* item = me->array + iter->current * me->m_size;
+    void* item = aqueue_array(me) + iter->current * me->m_size;
 
     iter->current++;
 
@@ -186,7 +191,7 @@ void *aqueue_iter_next_reverse(arrayqueue_t* me,
     if (!aqueue_iter_has_next_reverse(me, iter))
         return NULL;
 
-    void* val = me->array + iter->current * me->m_size;
+    void* val = aqueue_array(me) + iter->current * me->m_size;
 
     iter->current--;
     if (iter->current < 0)
